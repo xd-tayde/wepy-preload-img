@@ -1,0 +1,108 @@
+<style lang="scss">
+.mt-preload{
+    .mt-proload-image{
+        position: absolute;
+        left: -999rpx;
+        top: -999rpx;
+        width: 0;
+        height: 0;
+        visibility: hidden;
+    }
+}
+</style>
+<template>
+    <view class="mt-preload">
+        <image wx:for="{{loadList}}"
+            wx:key="{{index}}"
+            class="mt-proload-image"
+            src="{{item}}"
+            @load="_propsLoadSuccess({{index}},{{item}})"
+            @error="_loadError({{false}}, {{item}})"
+        ></image>
+        <image wx:for="{{jsLoadList}}"
+            wx:key="{{index}}"
+            class="mt-proload-image"
+            src="{{item.url}}"
+            @load="_jsLoadSuccess({{item.n}},{{item.url}})"
+            @error="_loadError({{item.n}}, {{item}})"
+        ></image>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+
+export default class MTPreload extends wepy.component {
+    props = {
+        loadList: {
+            type: Array,
+            default: [],
+        },
+    }
+
+    data = {
+        propsLoaded: [],
+        // jsLoad
+        jsLoadIndex: 0,
+        jsLoadList: [],
+        jsLoadData: [],
+        jsLoaded: [],
+    }
+
+    methods = {
+        load: (urls, resolve = () => {}, reject = () => {}) => {
+            if (!urls) return;
+            if (typeof urls == 'string') urls = [urls];
+
+            this.jsLoadData.push({
+                list: urls,
+                success: resolve,
+                fail: reject,
+            });
+            urls.forEach(v => {
+                this.jsLoadList.push({
+                    url: v,
+                    n: this.jsLoadData.length - 1,
+                });
+            });
+        },
+        _propsLoadSuccess: (index, url) => {
+            this.propsLoaded.push(url);
+            if (this.propsLoaded.length >= this.loadList.length) {
+                this.$emit('loadedAll', this.loadList);
+                this.loadList = [];
+            }
+        },
+        _jsLoadSuccess: (n, url, e) => {
+            if (!this.jsLoaded[n]) this.jsLoaded[n] = [];
+            this.jsLoaded[n].push({
+                url,
+                width: e.detail.width,
+                height: e.detail.height,
+            });
+            let item = this.jsLoadData[n];
+            this.arrayRemove(item.list, url);
+            if (!item.list.length) {
+                item.success(this.jsLoaded[n]);
+                this.jsLoadList = [];
+            } else {
+                console.log('图片加载失败', item.list.length);
+            }
+        },
+        _loadError: (n, item) => {
+            if (n == false) {
+                this.$emit('loadedFail', item);
+            } else {
+                let item = this.jsLoadData[n];
+                item.fail(item);
+            }
+        },
+    }
+    arrayRemove(array, item) {
+        let index = array.indexOf(item);
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+        return this;
+    }
+}
+</script>

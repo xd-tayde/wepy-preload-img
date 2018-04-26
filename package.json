@@ -1,0 +1,21 @@
+{
+  "name": "wepy-preload-img",
+  "version": "1.0.0",
+  "description": "the preload image module of wepy",
+  "keywords": [
+    "wepy-preload",
+    "wepy-preload-img",
+    "wepy",
+    "preload",
+    "image",
+    "img",
+    "preloadImage",
+    "preloadImg"
+  ],
+  "main": "index.wpy",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "GXD",
+  "license": "MIT"
+}
