@@ -29,7 +29,7 @@
     </view>
 </template>
 <script>
-import wepy from 'wepy';
+import wepy from 'wepy'
 
 export default class MTPreload extends wepy.component {
     props = {
@@ -50,59 +50,59 @@ export default class MTPreload extends wepy.component {
 
     methods = {
         load: (urls, resolve = () => {}, reject = () => {}) => {
-            if (!urls) return;
-            if (typeof urls == 'string') urls = [urls];
+            if (!urls) return
+            if (typeof urls == 'string') urls = [urls]
 
             this.jsLoadData.push({
                 list: urls,
                 success: resolve,
                 fail: reject,
-            });
+            })
             urls.forEach(v => {
                 this.jsLoadList.push({
                     url: v,
                     n: this.jsLoadData.length - 1,
-                });
-            });
+                })
+            })
         },
         _propsLoadSuccess: (index, url) => {
-            this.propsLoaded.push(url);
+            this.propsLoaded.push(url)
             if (this.propsLoaded.length >= this.loadList.length) {
-                this.$emit('loadedAll', this.loadList);
-                this.loadList = [];
+                this.$emit('loadedAll', this.loadList)
+                this.loadList = []
             }
         },
         _jsLoadSuccess: (n, url, e) => {
-            if (!this.jsLoaded[n]) this.jsLoaded[n] = [];
+            if (!this.jsLoaded[n]) this.jsLoaded[n] = []
             this.jsLoaded[n].push({
                 url,
                 width: e.detail.width,
                 height: e.detail.height,
-            });
-            let item = this.jsLoadData[n];
-            this.arrayRemove(item.list, url);
+            })
+            let item = this.jsLoadData[n]
+            this.arrayRemove(item.list, url)
             if (!item.list.length) {
-                item.success(this.jsLoaded[n]);
-                this.jsLoadList = [];
+                item.success(this.jsLoaded[n])
+                this.jsLoadList = []
             } else {
-                console.log('图片加载失败', item.list.length);
+                console.log('图片加载失败', item.list.length)
             }
         },
         _loadError: (n, item) => {
             if (n == false) {
-                this.$emit('loadedFail', item);
+                this.$emit('loadedFail', item)
             } else {
-                let item = this.jsLoadData[n];
-                item.fail(item);
+                let item = this.jsLoadData[n]
+                item.fail(item)
             }
         },
     }
     arrayRemove(array, item) {
-        let index = array.indexOf(item);
+        let index = array.indexOf(item)
         if (index > -1) {
-            array.splice(index, 1);
+            array.splice(index, 1)
         }
-        return this;
+        return this
     }
 }
 </script>
